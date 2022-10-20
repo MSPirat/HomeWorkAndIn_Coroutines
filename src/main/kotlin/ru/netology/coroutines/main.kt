@@ -1,93 +1,19 @@
 package ru.netology.coroutines
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
-import ru.netology.coroutines.dto.Comment
-import ru.netology.coroutines.dto.Post
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 // Cancellation sample
 private val gson = Gson()
 private val BASE_URL = "http://127.0.0.1:9999"
 private val client = OkHttpClient.Builder()
-    .addInterceptor(HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BASIC
-    })
-    .connectTimeout(30, TimeUnit.SECONDS)
-    .build()
-
-/**
- * Не отработает, так как функция job.cancelAndJoin() отменяет корутины вывода на печать "ок" до их выполнения.
- * Можно заменить job.cancelAndJoin() -> job.join() или изменить задержку на её выполнение, установив значение
- * в delay больше 500
- */
-/*fun main() = runBlocking {
-    val job = CoroutineScope(EmptyCoroutineContext).launch {
-        launch {
-            delay(500)
-            println("first ok") // <--
-        }
-        launch {
-            delay(500)
-            println("second ok")
-        }
-    }
-    delay(100)
-//    job.cancelAndJoin()
-    job.join()
-}
-*/
-
-/**
- * Не отработает, так как функция child.cancel() отменяет корутину вывода на печать первой "ок" до её выполнения.
- * При этом второй "ок" выводится на печать нормально.
- * Можно заменить child.cancel() -> child.join() или изменить задержку на её выполнение, установив значение
- * в delay больше 500
- */
-/*
-fun main() = runBlocking {
-    val job = CoroutineScope(EmptyCoroutineContext).launch {
-        val child = launch {
-            delay(500)
-            println("first ok") // <--
-        }
-        launch {
-            delay(500)
-            println("second ok")
-        }
-        delay(1000)
-        child.cancel()
-    }
-    delay(100)
-    job.join()
-}
-*/
-
-/**
- * Не отработает, так как прежде выведется исключение Exception("something bad happened") ???
- */
-fun main() {
-    with(CoroutineScope(EmptyCoroutineContext)) {
-        try {
-            launch {
-                throw Exception("something bad happened")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace() // <--
-        }
-    }
-    Thread.sleep(1000)
-}
-
-
+	.addInterceptor(HttpLoggingInterceptor().apply {
+		level = HttpLoggingInterceptor.Level.BASIC
+	})
+	.connectTimeout(30, TimeUnit.SECONDS)
+	.build()
 
 /*
 fun main() = runBlocking {
@@ -158,7 +84,7 @@ suspend fun OkHttpClient.apiCall(url: String): Response {
 }
 */
 
-/* // Sample with launch vs async (launch)
+	/* // Sample with launch vs async (launch)
 private val gson = Gson()
 private val BASE_URL = "http://127.0.0.1:9999"
 private val client = OkHttpClient.Builder()
@@ -231,7 +157,7 @@ suspend fun OkHttpClient.apiCall(url: String): Response {
 }
 */
 
-/* // Sample with launch vs async (async)
+	/* // Sample with launch vs async (async)
 private val gson = Gson()
 private val BASE_URL = "http://127.0.0.1:9999"
 private val client = OkHttpClient.Builder()
@@ -304,7 +230,7 @@ suspend fun OkHttpClient.apiCall(url: String): Response {
 }
 */
 
-/* // withContext Sample
+	/* // withContext Sample
 private val gson = Gson()
 private val BASE_URL = "http://127.0.0.1:9999"
 private val client = OkHttpClient.Builder()
@@ -377,7 +303,7 @@ suspend fun OkHttpClient.apiCall(url: String): Response {
 }
 */
 
-/* // Exception with Thread
+	/* // Exception with Thread
 fun main() {
     thread {
         println("before exception")
@@ -387,7 +313,7 @@ fun main() {
 }
 */
 
-/* // Exception Sample
+	/* // Exception Sample
 fun main() {
     with(CoroutineScope(EmptyCoroutineContext)) {
         launch {
@@ -399,7 +325,7 @@ fun main() {
 }
 */
 
-/* // Exception Sample
+	/* // Exception Sample
 fun main() {
     with(CoroutineScope(EmptyCoroutineContext)) {
         async {
@@ -411,7 +337,7 @@ fun main() {
 }
 */
 
-/* // Exception Handler Sample
+	/* // Exception Handler Sample
 fun main() {
     val handler = CoroutineExceptionHandler { context, throwable ->
         println(throwable)
@@ -425,7 +351,7 @@ fun main() {
 }
 */
 
-/* // Exception Job State Sample
+	/* // Exception Job State Sample
 fun main() {
     val job = CoroutineScope(EmptyCoroutineContext).launch {
         println("before exception")
@@ -437,7 +363,7 @@ fun main() {
 */
 
 
-/* // Exception Job State Sample with async/await
+	/* // Exception Job State Sample with async/await
 fun main() {
     val job = CoroutineScope(EmptyCoroutineContext).launch {
         try {
@@ -456,7 +382,7 @@ fun main() {
 }
 */
 
-/* Multiple CoroutineScope sample
+	/* Multiple CoroutineScope sample
 fun main() {
     val job = CoroutineScope(EmptyCoroutineContext).launch {
         CoroutineScope(EmptyCoroutineContext).launch {
@@ -475,7 +401,7 @@ fun main() {
 }
 */
 
-/* // coroutineScope sample
+	/* // coroutineScope sample
 fun main() {
     val job = CoroutineScope(EmptyCoroutineContext).launch {
         try {
@@ -497,7 +423,7 @@ fun main() {
 }
 */
 
-/* withContext sample
+	/* withContext sample
 fun main() {
     val job = CoroutineScope(EmptyCoroutineContext).launch {
         try {
@@ -519,7 +445,7 @@ fun main() {
 }
 */
 
-/*
+	/*
 fun main() {
     with(CoroutineScope(EmptyCoroutineContext + SupervisorJob())) {
         launch {
@@ -535,7 +461,7 @@ fun main() {
 }
 */
 
-/*
+	/*
 fun main() {
     CoroutineScope(EmptyCoroutineContext).launch {
         val job = supervisorScope {
