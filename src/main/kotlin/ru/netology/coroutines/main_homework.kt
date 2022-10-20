@@ -5,6 +5,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 
 /**
+ * Вопросы: Cancellation
+ *
  * 1. Не отработает, так как функция job.cancelAndJoin() отменяет корутины вывода на печать "ок" до их выполнения.
  * Можно заменить job.cancelAndJoin() -> job.join() или изменить задержку на её выполнение, установив значение
  * в delay больше 500
@@ -52,7 +54,9 @@ fun main() = runBlocking {
 */
 
 /**
- * 3. Не отработает, так как прежде выведется исключение Exception("something bad happened")
+ * Вопросы: Exception Handling
+ *
+ * 1. Не отработает, так как прежде выведется исключение Exception("something bad happened")
  * Из презентации к лекции © "Нет смысла писать вот такой код, он не перехватит никаких исключений"
  */
 /*
@@ -69,6 +73,47 @@ fun main() {
     Thread.sleep(1000)
 }
 */
+
+/**
+ * 2. Отработает, выбросится исключение Exception "something bad happened".
+ * и в отладчике можно наблюдать Coroutine Creation Stack Trace
+ */
+/*
+fun main() {
+	CoroutineScope(EmptyCoroutineContext).launch {
+		try {
+			coroutineScope {
+				throw Exception("something bad happened")
+			}
+		} catch (e: Exception) {
+			println("111")
+			e.printStackTrace() // <--
+		}
+	}
+	Thread.sleep(1000)
+}
+*/
+
+/**
+ * 3. Отработает, так как функция supervisorScope приостановит выброс исключения Exception "something bad happened"
+ * до выполнения её child с печатью stacktrace.
+ * Также в отладчике можно наблюдать Coroutine Creation Stack Trace.
+ */
+
+fun main() {
+	CoroutineScope(EmptyCoroutineContext).launch {
+		try {
+			supervisorScope {
+				throw Exception("something bad happened")
+			}
+		} catch (e: Exception) {
+			println("222")
+			e.printStackTrace() // <--
+		}
+	}
+	Thread.sleep(1000)
+}
+
 
 /**
  * 4. Не отработает, так как функция delay приостановит поток, в результате чего выйдет второй Exception.
@@ -148,6 +193,7 @@ fun main() {
  * Для выполнения печати первой "ок", можно обрабатывать ошибки только вывода на печать второй "ок",
  * тогда он не будет влиять на вывод печати первой "ок" и уменьшить время задержки delay первой "ок"
  */
+/*
 fun main() {
 	CoroutineScope(EmptyCoroutineContext).launch {
 		CoroutineScope(EmptyCoroutineContext + SupervisorJob()).launch {
@@ -164,3 +210,4 @@ fun main() {
 	}
 	Thread.sleep(1000)
 }
+*/
